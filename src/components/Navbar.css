@@ -43,6 +43,29 @@
   list-style: none;
 }
 
+.navbar-user {
+  display: flex;
+  align-items: center;
+}
+
+.user-info {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+}
+
+.logout-btn {
+  background-color: rgba(239, 68, 68, 0.2) !important;
+  border: 1px solid rgba(239, 68, 68, 0.5) !important;
+}
+
+.logout-btn:hover {
+  background-color: rgba(239, 68, 68, 0.4) !important;
+}
+
 .nav-link {
   color: white;
   text-decoration: none;
