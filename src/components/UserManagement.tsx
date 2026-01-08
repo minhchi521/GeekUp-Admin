@@ -8,6 +8,7 @@ export const UserManagement = () => {
   const [loading, setLoading] = useState(false)
   const [editingId, setEditingId] = useState<number | null>(null)
   const [showForm, setShowForm] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
   const [formData, setFormData] = useState<Omit<User, 'id'> & { id?: number }>({
     name: '',
     email: '',
@@ -78,6 +79,11 @@ export const UserManagement = () => {
     setShowForm(false)
   }
 
+  const filteredUsers = users.filter((user) =>
+    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
   return (
     <div className="user-management">
       <div className="management-header">
@@ -134,14 +140,24 @@ export const UserManagement = () => {
         </form>
       )}
 
+      <div className="search-section">
+        <input
+          type="text"
+          placeholder="Search users by name or email..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="search-input"
+        />
+      </div>
+
       {loading ? (
         <div className="loading">
           <div className="spinner"></div>
         </div>
       ) : (
         <div className="users-table">
-          {users.length === 0 ? (
-            <p className="no-data">No users found</p>
+          {filteredUsers.length === 0 ? (
+            <p className="no-data">{searchTerm ? 'No users match your search' : 'No users found'}</p>
           ) : (
             <table>
               <thead>
@@ -154,7 +170,7 @@ export const UserManagement = () => {
                 </tr>
               </thead>
               <tbody>
-                {users.map((user) => (
+                {filteredUsers.map((user) => (
                   <tr key={user.id}>
                     <td>
                       <img 

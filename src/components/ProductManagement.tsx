@@ -8,6 +8,7 @@ export const ProductManagement = () => {
   const [loading, setLoading] = useState(false)
   const [editingId, setEditingId] = useState<number | null>(null)
   const [showForm, setShowForm] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
   const [formData, setFormData] = useState<Omit<Product, 'id'> & { id?: number }>({
     title: '',
     description: '',
@@ -31,19 +32,25 @@ export const ProductManagement = () => {
     }
   }
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
-    try {
-      if (editingId) {
-        await productService.update(editingId, formData)
-      } else {
-        await productService.create(formData)
-      }
-      fetchProducts()
-      resetForm()
-    } catch (error) {
-      console.error('Failed to save product:', error)
+    if (editingId) {
+      // Update product in state only (not calling API)
+      setProducts(products.map(p =>
+        p.id === editingId
+          ? { ...p, ...formData }
+          : p
+      ))
+    } else {
+      // Add new product to state only (not calling API)
+      const newProduct: Product = {
+        ...formData,
+        id: Math.max(...products.map(p => p.id), 0) + 1,
+        image: `https://picsum.photos/400/300?random=${Math.random()}`
+      } as Product
+      setProducts([...products, newProduct])
     }
+    resetForm()
   }
 
   const handleEdit = (product: Product) => {
@@ -57,14 +64,10 @@ export const ProductManagement = () => {
     setShowForm(true)
   }
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = (id: number) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
-      try {
-        await productService.delete(id)
-        fetchProducts()
-      } catch (error) {
-        console.error('Failed to delete product:', error)
-      }
+      // Delete from state only (not calling API)
+      setProducts(products.filter(p => p.id !== id))
     }
   }
 
@@ -78,6 +81,11 @@ export const ProductManagement = () => {
     setEditingId(null)
     setShowForm(false)
   }
+
+  const filteredProducts = products.filter((product) =>
+    product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.description.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   return (
     <div className="product-management">
@@ -151,42 +159,60 @@ export const ProductManagement = () => {
         </form>
       )}
 
+      <div className="search-section">
+        <input
+          type="text"
+          placeholder="Search products by title or description..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="search-input"
+        />
+      </div>
+
       {loading ? (
         <div className="loading">
           <div className="spinner"></div>
         </div>
       ) : (
         <div className="products-grid">
-          {products.length === 0 ? (
-            <p className="no-data">No products found</p>
+          {filteredProducts.length === 0 ? (
+            <p className="no-data">{searchTerm ? 'No products match your search' : 'No products found'}</p>
           ) : (
-            products.map((product) => (
+            filteredProducts.map((product) => (
               <div key={product.id} className="product-card">
-                <img
-                  src={product.image}
-                  alt={product.title}
-                  className="product-image"
-                />
+                <div className="product-image-container">
+                  <img
+                    src={product.image}
+                    alt={product.title}
+                    className="product-image"
+                  />
+                  <div className="product-overlay">
+                    <button
+                      className="btn btn-sm btn-warning"
+                      onClick={() => {}}
+                    >
+                      Details
+                    </button>
+                    <button
+                      className="btn btn-sm btn-info"
+                      onClick={() => handleEdit(product)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="btn btn-sm btn-danger"
+                      onClick={() => handleDelete(product.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
                 <div className="product-info">
                   <div className="product-category">{product.category}</div>
                   <h3>{product.title}</h3>
                   <p className="product-description">{product.description.substring(0, 100)}...</p>
                   <div className="product-footer">
                     <div className="product-price">${product.price.toFixed(2)}</div>
-                    <div className="product-actions">
-                      <button
-                        className="btn btn-sm btn-info"
-                        onClick={() => handleEdit(product)}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="btn btn-sm btn-danger"
-                        onClick={() => handleDelete(product.id)}
-                      >
-                        Delete
-                      </button>
-                    </div>
                   </div>
                 </div>
               </div>

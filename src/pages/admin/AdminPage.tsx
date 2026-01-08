@@ -1,12 +1,11 @@
 import { Navbar } from '../../components/Navbar'
 import { UserManagement } from '../../components/UserManagement'
 import { ProductManagement } from '../../components/ProductManagement'
-import { ProductList } from '../../components/ProductList'
 import './AdminPage.css'
 import { useState } from 'react'
 
 export const AdminPage = () => {
-  const [activeTab, setActiveTab] = useState<'users' | 'products' | 'productList'>('users')
+  const [activeTab, setActiveTab] = useState<'users' | 'products'>('users')
 
   return (
     <div className="admin-page">
@@ -28,19 +27,11 @@ export const AdminPage = () => {
               <span className="menu-icon">📦</span>
               Product Management
             </button>
-            <button
-              className={`menu-item ${activeTab === 'productList' ? 'active' : ''}`}
-              onClick={() => setActiveTab('productList')}
-            >
-              <span className="menu-icon">📋</span>
-              Product List
-            </button>
           </div>
         </aside>
         <main className="admin-content">
           {activeTab === 'users' && <UserManagement />}
           {activeTab === 'products' && <ProductManagement />}
-          {activeTab === 'productList' && <ProductList />}
         </main>
       </div>
     </div>
