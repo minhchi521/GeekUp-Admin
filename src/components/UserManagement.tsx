@@ -30,19 +30,25 @@ export const UserManagement = () => {
     }
   }
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
-    try {
-      if (editingId) {
-        await userService.update(editingId, formData)
-      } else {
-        await userService.create(formData)
-      }
-      fetchUsers()
-      resetForm()
-    } catch (error) {
-      console.error('Failed to save user:', error)
+    if (editingId) {
+      // Update user in state only (not calling API)
+      setUsers(users.map(u =>
+        u.id === editingId
+          ? { ...u, ...formData }
+          : u
+      ))
+    } else {
+      // Add new user to state only (not calling API)
+      const newUser: User = {
+        ...formData,
+        id: Math.max(...users.map(u => u.id), 0) + 1,
+        avatar: `https://ui-avatars.com/api/?name=${formData.name}`
+      } as User
+      setUsers([...users, newUser])
     }
+    resetForm()
   }
 
   const handleEdit = (user: User) => {
@@ -55,14 +61,10 @@ export const UserManagement = () => {
     setShowForm(true)
   }
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = (id: number) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
-      try {
-        await userService.delete(id)
-        fetchUsers()
-      } catch (error) {
-        console.error('Failed to delete user:', error)
-      }
+      // Delete from state only (not calling API)
+      setUsers(users.filter(u => u.id !== id))
     }
   }
 
