@@ -1,0 +1,50 @@
+import { Navbar } from '../../components/Navbar'
+import { UserManagement } from '../../components/UserManagement'
+import { ProductManagement } from '../../components/ProductManagement'
+import { ProductList } from '../../components/ProductList'
+import './AdminPage.css'
+import { useState } from 'react'
+
+export const AdminPage = () => {
+  const [activeTab, setActiveTab] = useState<'users' | 'products' | 'productList'>('users')
+
+  return (
+    <div className="admin-page">
+      <Navbar />
+      <div className="admin-container">
+        <aside className="admin-sidebar">
+          <div className="sidebar-menu">
+            <button
+              className={`menu-item ${activeTab === 'users' ? 'active' : ''}`}
+              onClick={() => setActiveTab('users')}
+            >
+              <span className="menu-icon">👥</span>
+              User Management
+            </button>
+            <button
+              className={`menu-item ${activeTab === 'products' ? 'active' : ''}`}
+              onClick={() => setActiveTab('products')}
+            >
+              <span className="menu-icon">📦</span>
+              Product Management
+            </button>
+            <button
+              className={`menu-item ${activeTab === 'productList' ? 'active' : ''}`}
+              onClick={() => setActiveTab('productList')}
+            >
+              <span className="menu-icon">📋</span>
+              Product List
+            </button>
+          </div>
+        </aside>
+        <main className="admin-content">
+          {activeTab === 'users' && <UserManagement />}
+          {activeTab === 'products' && <ProductManagement />}
+          {activeTab === 'productList' && <ProductList />}
+        </main>
+      </div>
+    </div>
+  )
+}
+
+export default AdminPage
